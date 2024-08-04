@@ -12,6 +12,9 @@ class Connector
     {
     }
 
+    /**
+     * @throws \PDOException
+     */
     public static function getInstance(string $host, string $database, string $username, string $password): PDO
     {
         if (self::$instance === null) {

@@ -1,0 +1,21 @@
+<?php
+
+namespace Meirelles\EnumMapper\Enum;
+
+enum {{enumName}}: {{enumType}}
+{
+{{#constants}}
+    case {{name}} = {{value}};
+{{/constants}}
+{{#hasText}}
+
+    public function getText(): string
+    {
+        return match($this) {
+        {{#constants}}
+            self::{{name}} => {{text}},
+        {{/constants}}
+        };
+    }
+{{/hasText}}
+}
