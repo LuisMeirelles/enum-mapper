@@ -1,6 +1,6 @@
 <?php
 
-namespace Meirelles\EnumMapper\Enum;
+namespace Meirelles\EnumMapper\Core;
 
 use Meirelles\EnumMapper\DB\Connector;
 use Mustache_Engine;
@@ -16,15 +16,19 @@ readonly class Mapper
     {
     }
 
-    /**
-     * @return bool
-     */
-    public function execute(): bool
+    public function execute(): void
     {
         $template = file_get_contents('src/templates/default_enum.mustache');
 
         if (!$template) {
             throw new RuntimeException('Failed to read template');
+        }
+
+        $enumPath = $this->config->enumPath;
+        $enumPath = rtrim($enumPath, '/');
+
+        if (!is_dir($enumPath)) {
+            mkdir($enumPath, 0755, true);
         }
 
         try {
@@ -45,6 +49,8 @@ readonly class Mapper
 
         $enumName = $this->config->enumName;
         $enumName = mb_ucfirst($enumName);
+
+        $namespace = $this->config->namespace;
 
         $enumType = $this->config->enumType;
 
@@ -91,12 +97,23 @@ readonly class Mapper
         }
 
         $output = $mustacheEngine->render($template, [
+            'namespace' => $namespace,
             'enumName' => $enumName,
             'enumType' => $enumType,
             'constants' => $constants,
             'hasText' => $hasText
         ]);
 
-        return (bool)file_put_contents("src/Enum/$enumName.php", $output);
+        $createFile = (bool)file_put_contents("$enumPath/$enumName.php", $output);
+
+        if (!$createFile) {
+            throw new RuntimeException('Failed to create enum file');
+        }
+
+        $changeMode = chmod(realpath("$enumPath/$enumName.php"), 0644);
+
+        if (!$changeMode) {
+            throw new RuntimeException('Failed to change mode of enum file');
+        }
     }
 }
