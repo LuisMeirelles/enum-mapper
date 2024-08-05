@@ -73,7 +73,7 @@ readonly class Mapper
         $valueColumnName = $this->config->valueColumnName;
         $mbCaseFlag = $this->config->mbCaseFlag;
 
-        $hasText = $this->config->hasText;
+        $hasText = $this->config->hasDescription;
 
         foreach ($result as $item) {
             $id = $item[$idColumnName];

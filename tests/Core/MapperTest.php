@@ -4,6 +4,10 @@ namespace Tests\Core;
 
 use Meirelles\EnumMapper\Core\Config;
 use Meirelles\EnumMapper\Core\Mapper;
+use Meirelles\EnumMapper\DB\Connector;
+use Mockery;
+use PDO;
+use PDOStatement;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -32,6 +36,21 @@ class MapperTest extends TestCase
 
     public function testIfEnumFileIsCreatedWithDefaultConfigs()
     {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andReturn([
+                ['id' => 1, 'value' => 'admin'],
+                ['id' => 2, 'value' => 'guest'],
+            ]);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        $connectorMock = Mockery::mock('alias:' . Connector::class);
+        $connectorMock->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
         $enumName = 'Role';
 
         $config = new Config(
@@ -55,6 +74,21 @@ class MapperTest extends TestCase
 
     public function testIfEnumFileIsCreatedWithRightNamespace()
     {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andReturn([
+                ['id' => 1, 'value' => 'admin'],
+                ['id' => 2, 'value' => 'guest'],
+            ]);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        $connectorMock = Mockery::mock('alias:' . Connector::class);
+        $connectorMock->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
         $enumName = 'Role';
 
         $config = new Config(
@@ -80,6 +114,21 @@ class MapperTest extends TestCase
 
     public function testIfEnumFileIsCreatedInNonExistentDirectory()
     {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andReturn([
+                ['id' => 1, 'value' => 'admin'],
+                ['id' => 2, 'value' => 'guest'],
+            ]);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        $connectorMock = Mockery::mock('alias:' . Connector::class);
+        $connectorMock->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
         $enumName = 'Role';
 
         $config = new Config(
@@ -91,6 +140,45 @@ class MapperTest extends TestCase
             enumName: $enumName,
             enumPath: __DIR__ . '/../../src/Enums/Not/Existent/Directory',
             namespace: 'Meirelles\EnumMapper\Enums\Not\Existent\Directory'
+        );
+
+        $this->enumPath = $config->enumPath;
+        $this->outputFilePath = "$this->enumPath/$enumName.php";
+
+        $mapper = new Mapper($config);
+
+        $mapper->execute();
+
+        $this->assertFileExists($this->outputFilePath);
+    }
+
+    public function testIfEnumFileIsCreatedWithDescriptionColumn()
+    {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andReturn([
+                ['id' => 1, 'value' => 'admin', 'description' => 'Administrador'],
+                ['id' => 2, 'value' => 'guest', 'description' => 'Visitante'],
+            ]);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        $connectorMock = Mockery::mock('alias:' . Connector::class);
+        $connectorMock->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
+        $enumName = 'Role';
+
+        $config = new Config(
+            host: $_ENV['DB_HOST'],
+            database: $_ENV['DB_DATABASE'],
+            username: $_ENV['DB_USERNAME'],
+            password: $_ENV['DB_PASSWORD'],
+            tableName: 'roles',
+            enumName: $enumName,
+            hasDescription: true,
         );
 
         $this->enumPath = $config->enumPath;

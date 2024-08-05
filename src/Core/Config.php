@@ -10,7 +10,7 @@ readonly class Config
      * @param string $username database username
      * @param string $password database password
      * @param string $tableName table name to store the enums
-     * @param bool $hasText if the enum has a text column
+     * @param bool $hasDescription if the enum has a text column
      * @param string $textColumnName text column name
      * @param string $valueColumnName value column name
      * @param string $idColumnName id column name
@@ -24,7 +24,7 @@ readonly class Config
         public string $tableName,
         public string $enumName,
         public string $enumType = 'int',
-        public bool   $hasText = false,
+        public bool   $hasDescription = false,
         public string $textColumnName = 'description',
         public string $valueColumnName = 'value',
         public string $idColumnName = 'id',
