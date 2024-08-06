@@ -8,14 +8,7 @@ class Connector
 {
     private static ?PDO $instance = null;
 
-    private function __construct()
-    {
-    }
-
-    /**
-     * @throws \PDOException
-     */
-    public static function getInstance(string $host, string $database, string $username, string $password): PDO
+    private function __construct(string $host, string $database, string $username, string $password)
     {
         if (self::$instance === null) {
             self::$instance = new PDO(
@@ -24,6 +17,14 @@ class Connector
                 $password
             );
         }
+    }
+
+    /**
+     * @throws \PDOException
+     */
+    public static function getInstance(string $host, string $database, string $username, string $password): PDO
+    {
+        new self($host, $database, $username, $password);
 
         return self::$instance;
     }
