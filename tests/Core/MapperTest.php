@@ -259,6 +259,39 @@ class MapperTest extends TestCase
         $mapper->execute();
     }
 
+    public function testExecuteThrowsRuntimeExceptionWhenFetchingDataFails()
+    {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andThrow(PDOException::class);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        Mockery::mock('alias:' . Connector::class)
+            ->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
+        $enumName = 'Role';
+
+        $config = new Config(
+            host: $_ENV['DB_HOST'],
+            database: $_ENV['DB_DATABASE'],
+            username: $_ENV['DB_USERNAME'],
+            password: $_ENV['DB_PASSWORD'],
+            tableName: 'roles',
+            enumName: $enumName,
+        );
+
+        $mapper = new Mapper($config);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to fetch data from database');
+
+        $mapper->execute();
+    }
+
     private static function removeFile(string $filePath): void
     {
         if (file_exists($filePath)) {
