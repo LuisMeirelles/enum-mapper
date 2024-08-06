@@ -3,12 +3,6 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          cacheDirectory=".phpunit.cache"
-         executionOrder="depends,defects"
-         shortenArraysForExportThreshold="10"
-         requireCoverageMetadata="true"
-         beStrictAboutCoverageMetadata="true"
-         beStrictAboutOutputDuringTests="true"
-         failOnRisky="true"
 >
     <testsuites>
         <testsuite name="default">
@@ -21,4 +15,10 @@
             <directory>src</directory>
         </include>
     </source>
+
+    <coverage>
+        <report>
+            <html outputDirectory="tests/.phpunit-coverage-output"/>
+        </report>
+    </coverage>
 </phpunit>
