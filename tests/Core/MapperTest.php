@@ -10,9 +10,13 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
+#[CoversClass(Mapper::class)]
+#[UsesClass(Config::class)]
 class MapperTest extends TestCase
 {
     /**
