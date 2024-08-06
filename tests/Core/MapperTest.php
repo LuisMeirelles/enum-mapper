@@ -7,6 +7,7 @@ use Meirelles\EnumMapper\Core\Mapper;
 use Meirelles\EnumMapper\DB\Connector;
 use Mockery;
 use PDO;
+use PDOException;
 use PDOStatement;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\TestCase;
@@ -14,9 +15,6 @@ use RuntimeException;
 
 class MapperTest extends TestCase
 {
-    private string $outputFilePath;
-    private string $enumPath;
-
     /**
      * @param string $dirPath
      * @return string
@@ -29,9 +27,9 @@ class MapperTest extends TestCase
     }
 
     #[After]
-    protected function cleanupFile(): void
+    protected function tearDown(): void
     {
-        $this->removeDirectory($this->enumPath);
+        Mockery::close();
     }
 
     public function testIfEnumFileIsCreatedWithDefaultConfigs()
@@ -62,14 +60,16 @@ class MapperTest extends TestCase
             enumName: $enumName,
         );
 
-        $this->enumPath = $config->enumPath;
-        $this->outputFilePath = "$this->enumPath/$enumName.php";
+        $enumPath = $config->enumPath;
+        $outputFilePath = "$enumPath/$enumName.php";
 
         $mapper = new Mapper($config);
 
         $mapper->execute();
 
-        $this->assertFileExists($this->outputFilePath);
+        $this->assertFileExists($outputFilePath);
+
+        $this->removeDirectory($enumPath);
     }
 
     public function testIfEnumFileIsCreatedWithRightNamespace()
@@ -100,16 +100,18 @@ class MapperTest extends TestCase
             enumName: $enumName,
         );
 
-        $this->enumPath = $config->enumPath;
-        $this->outputFilePath = "$this->enumPath/$enumName.php";
+        $enumPath = $config->enumPath;
+        $outputFilePath = "$enumPath/$enumName.php";
 
         $mapper = new Mapper($config);
 
         $mapper->execute();
 
-        $fileContent = file_get_contents($this->outputFilePath);
+        $fileContent = file_get_contents($outputFilePath);
 
         $this->assertStringContainsString('namespace Meirelles\EnumMapper\Enums;', $fileContent);
+
+        $this->removeDirectory($enumPath);
     }
 
     public function testIfEnumFileIsCreatedInNonExistentDirectory()
@@ -142,14 +144,16 @@ class MapperTest extends TestCase
             namespace: 'Meirelles\EnumMapper\Enums\Not\Existent\Directory'
         );
 
-        $this->enumPath = $config->enumPath;
-        $this->outputFilePath = "$this->enumPath/$enumName.php";
+        $enumPath = $config->enumPath;
+        $outputFilePath = "$enumPath/$enumName.php";
 
         $mapper = new Mapper($config);
 
         $mapper->execute();
 
-        $this->assertFileExists($this->outputFilePath);
+        $this->assertFileExists($outputFilePath);
+
+        $this->removeDirectory($enumPath);
     }
 
     public function testIfEnumFileIsCreatedWithDescriptionColumn()
@@ -181,14 +185,78 @@ class MapperTest extends TestCase
             hasDescription: true,
         );
 
-        $this->enumPath = $config->enumPath;
-        $this->outputFilePath = "$this->enumPath/$enumName.php";
+        $enumPath = $config->enumPath;
+        $outputFilePath = "$enumPath/$enumName.php";
 
         $mapper = new Mapper($config);
 
         $mapper->execute();
 
-        $this->assertFileExists($this->outputFilePath);
+        $this->assertFileExists($outputFilePath);
+
+        $this->removeDirectory($enumPath);
+    }
+
+    public function testExecuteThrowsExceptionWhenTemplateFileNotFound()
+    {
+        $pdoStatementMock = Mockery::mock(PDOStatement::class);
+        $pdoStatementMock->shouldReceive('fetchAll')
+            ->andReturn([
+                ['id' => 1, 'value' => 'admin'],
+                ['id' => 2, 'value' => 'guest'],
+            ]);
+
+        $pdoMock = Mockery::mock(PDO::class);
+        $pdoMock->shouldReceive('query')
+            ->andReturn($pdoStatementMock);
+
+        $connectorMock = Mockery::mock('alias:' . Connector::class);
+        $connectorMock->shouldReceive('getInstance')
+            ->andReturn($pdoMock);
+
+        $enumName = 'Role';
+
+        $config = new Config(
+            host: $_ENV['DB_HOST'],
+            database: $_ENV['DB_DATABASE'],
+            username: $_ENV['DB_USERNAME'],
+            password: $_ENV['DB_PASSWORD'],
+            tableName: 'roles',
+            enumName: $enumName,
+            templatePath: 'non/existing/directory/enum.mustache',
+        );
+
+        $mapper = new Mapper($config);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to read template');
+
+        $mapper->execute();
+    }
+
+    public function testExecuteThrowsRuntimeExceptionWhenConnectorFails()
+    {
+        Mockery::mock('alias:' . Connector::class)
+            ->shouldReceive('getInstance')
+            ->andThrow(PDOException::class);
+
+        $enumName = 'Role';
+
+        $config = new Config(
+            host: $_ENV['DB_HOST'],
+            database: $_ENV['DB_DATABASE'],
+            username: $_ENV['DB_USERNAME'],
+            password: $_ENV['DB_PASSWORD'],
+            tableName: 'roles',
+            enumName: $enumName,
+        );
+
+        $mapper = new Mapper($config);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to connect to database');
+
+        $mapper->execute();
     }
 
     private static function removeFile(string $filePath): void
