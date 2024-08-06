@@ -18,7 +18,7 @@ readonly class Mapper
 
     public function execute(): void
     {
-        $template = file_get_contents('src/templates/default_enum.mustache');
+        $template = file_get_contents($this->config->templatePath);
 
         if (!$template) {
             throw new RuntimeException('Failed to read template');

@@ -28,9 +28,10 @@ readonly class Config
         public string $textColumnName = 'description',
         public string $valueColumnName = 'value',
         public string $idColumnName = 'id',
-        public int    $mbCaseFlag = MB_CASE_UPPER,
         public string $enumPath = __DIR__ . '/../Enums',
         public string $namespace = 'Meirelles\EnumMapper\Enums',
+        public int    $mbCaseFlag = MB_CASE_UPPER,
+        public string $templatePath = __DIR__ . '/../templates/default_enum.mustache'
     )
     {
     }
