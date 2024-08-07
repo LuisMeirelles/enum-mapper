@@ -4,3 +4,4 @@
 /src/Enums/
 /.phpunit.cache
 /tests/.phpunit-coverage-output
+phpstan.neon
