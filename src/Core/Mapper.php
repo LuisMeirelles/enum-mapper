@@ -24,11 +24,11 @@ readonly class Mapper
             throw new RuntimeException('Failed to read template');
         }
 
-        $enumPath = $this->config->enumPath;
-        $enumPath = rtrim($enumPath, '/');
+        $enumDirectory = $this->config->enumPath;
+        $enumDirectory = rtrim($enumDirectory, '/');
 
-        if (!is_dir($enumPath)) {
-            mkdir($enumPath, 0755, true);
+        if (!is_dir($enumDirectory)) {
+            mkdir($enumDirectory, 0755, true);
         }
 
         try {
@@ -80,6 +80,11 @@ readonly class Mapper
 
             $memberName = $item[$valueColumnName];
             $memberName = iconv('UTF-8', 'ASCII//TRANSLIT', $memberName);
+
+            if (!$memberName) {
+                throw new RuntimeException("Failed to convert database value (`$tableName`.`$idColumnName` = `$id`) to enum member name");
+            }
+
             $memberName = str_replace(' ', '_', $memberName);
             $memberName = mb_convert_case($memberName, $mbCaseFlag);
 
@@ -106,13 +111,20 @@ readonly class Mapper
             'hasText' => $hasText
         ]);
 
-        $createFile = (bool)file_put_contents("$enumPath/$enumName.php", $output);
+        $enumPath = "$enumDirectory/$enumName.php";
+        $createFile = (bool)file_put_contents($enumPath, $output);
 
         if (!$createFile) {
             throw new RuntimeException('Failed to create enum file');
         }
 
-        $changeMode = chmod(realpath("$enumPath/$enumName.php"), 0644);
+        $canonicalEnumPath = realpath($enumPath);
+
+        if (!$canonicalEnumPath) {
+            throw new RuntimeException('Failed to get canonical path of enum file');
+        }
+
+        $changeMode = chmod($canonicalEnumPath, 0644);
 
         if (!$changeMode) {
             throw new RuntimeException('Failed to change mode of enum file');
