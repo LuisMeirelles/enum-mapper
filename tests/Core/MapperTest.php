@@ -36,7 +36,7 @@ class MapperTest extends TestCase
         Mockery::close();
     }
 
-    public function testIfEnumFileIsCreatedWithDefaultConfigs()
+    public function testIfEnumFileIsCreatedWithDefaultConfigs(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
@@ -76,7 +76,7 @@ class MapperTest extends TestCase
         $this->removeDirectory($enumPath);
     }
 
-    public function testIfEnumFileIsCreatedWithRightNamespace()
+    public function testIfEnumFileIsCreatedWithRightNamespace(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
@@ -118,7 +118,7 @@ class MapperTest extends TestCase
         $this->removeDirectory($enumPath);
     }
 
-    public function testIfEnumFileIsCreatedInNonExistentDirectory()
+    public function testIfEnumFileIsCreatedInNonExistentDirectory(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
@@ -160,7 +160,7 @@ class MapperTest extends TestCase
         $this->removeDirectory($enumPath);
     }
 
-    public function testIfEnumFileIsCreatedWithDescriptionColumn()
+    public function testIfEnumFileIsCreatedWithDescriptionColumn(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
@@ -201,7 +201,7 @@ class MapperTest extends TestCase
         $this->removeDirectory($enumPath);
     }
 
-    public function testExecuteThrowsExceptionWhenTemplateFileNotFound()
+    public function testExecuteThrowsExceptionWhenTemplateFileNotFound(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
@@ -238,7 +238,7 @@ class MapperTest extends TestCase
         $mapper->execute();
     }
 
-    public function testExecuteThrowsRuntimeExceptionWhenConnectorFails()
+    public function testExecuteThrowsRuntimeExceptionWhenConnectorFails(): void
     {
         Mockery::mock('alias:' . Connector::class)
             ->shouldReceive('getInstance')
@@ -263,7 +263,7 @@ class MapperTest extends TestCase
         $mapper->execute();
     }
 
-    public function testExecuteThrowsRuntimeExceptionWhenFetchingDataFails()
+    public function testExecuteThrowsRuntimeExceptionWhenFetchingDataFails(): void
     {
         $pdoStatementMock = Mockery::mock(PDOStatement::class);
         $pdoStatementMock->shouldReceive('fetchAll')
