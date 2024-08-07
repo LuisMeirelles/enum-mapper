@@ -1,9 +1,10 @@
 services:
   cli:
-    build:
-      context: .docker
+    build: '.docker'
     volumes:
-      - .:/app
+      - '.:/app'
+      - '.docker/php.ini:/usr/local/etc/php'
+      - '.docker/xdebug.ini:/usr/local/etc/php/conf.d/'
 
   database:
     image: mysql:8
