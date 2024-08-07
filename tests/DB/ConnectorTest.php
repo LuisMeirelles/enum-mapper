@@ -16,7 +16,7 @@ class ConnectorTest extends TestCase
         Mockery::close();
     }
 
-    public function testReturnPDOInstance()
+    public function testReturnPDOInstance(): void
     {
         $pdo = Connector::getInstance(
             host: $_ENV['DB_HOST'],
@@ -28,7 +28,7 @@ class ConnectorTest extends TestCase
         $this->assertInstanceOf(PDO::class, $pdo);
     }
 
-    public function testReturnSameInstance()
+    public function testReturnSameInstance(): void
     {
         $pdo1 = Connector::getInstance(
             host: $_ENV['DB_HOST'],
