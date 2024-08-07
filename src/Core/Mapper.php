@@ -79,6 +79,8 @@ readonly class Mapper
             $id = $item[$idColumnName];
 
             $memberName = $item[$valueColumnName];
+            $memberName = iconv('UTF-8', 'ASCII//TRANSLIT', $memberName);
+            $memberName = str_replace(' ', '_', $memberName);
             $memberName = mb_convert_case($memberName, $mbCaseFlag);
 
             $constants[] = [

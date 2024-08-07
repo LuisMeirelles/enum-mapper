@@ -27,7 +27,8 @@
         "php": ">= 8.3",
         "ext-pdo": "*",
         "symfony/dotenv": "^7.1",
-        "mustache/mustache": "^2.14"
+        "mustache/mustache": "^2.14",
+        "ext-iconv": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.3",
