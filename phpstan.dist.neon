@@ -4,4 +4,4 @@ parameters:
         - src
         - tests
     ignoreErrors:
-        - 'Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\:\:andThrow\(\)'
+        - '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\:\:andThrow\(\)#'

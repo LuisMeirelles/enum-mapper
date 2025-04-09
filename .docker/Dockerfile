@@ -31,5 +31,3 @@ USER app
 WORKDIR /app
 
 COPY .. /app
-
-CMD ["top", "-b"]

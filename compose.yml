@@ -3,8 +3,9 @@ services:
     build: '.docker'
     volumes:
       - '.:/app'
-      - '.docker/php.ini:/usr/local/etc/php'
-      - '.docker/xdebug.ini:/usr/local/etc/php/conf.d/'
+      - '.docker/php.ini:/usr/local/etc/php/php.ini'
+      - '.docker/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini'
+    tty: true
 
   database:
     image: mysql:8

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class ConnectorTest extends TestCase
 {
     #[After]
-    protected function tearDown(): void
+    protected function after(): void
     {
         Mockery::close();
     }

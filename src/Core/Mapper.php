@@ -79,7 +79,9 @@ readonly class Mapper
             $id = $item[$idColumnName];
 
             $memberName = $item[$valueColumnName];
-            $memberName = iconv('UTF-8', 'ASCII//TRANSLIT', $memberName);
+            $memberName = mb_convert_encoding($memberName, 'UTF-8', 'auto');
+            $memberName = preg_replace('/[^a-zA-Z0-9_\s]/', '', $memberName);
+            $memberName = str_replace(' ', '_', $memberName);
 
             if (!$memberName) {
                 throw new RuntimeException("Failed to convert database value (`$tableName`.`$idColumnName` = `$id`) to enum member name");
